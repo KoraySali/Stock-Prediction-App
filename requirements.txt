@@ -2,5 +2,4 @@ streamlit
 yfinance==0.2.43
 prophet==1.1.5
 pandas
-numpy
 plotly
