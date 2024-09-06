@@ -157,7 +157,7 @@ fig1.update_layout(
     yaxis_title="Price (USD)",
     xaxis_rangeslider_visible=True
 )
-st.plotly_chart(fig1)
+st.plotly_chart(fig1, use_container_width=True)
 
 # Show technical indicators
 if show_technical_indicators:
@@ -176,7 +176,7 @@ if show_technical_indicators:
         yaxis_title="Price (USD)",
         xaxis_rangeslider_visible=True
     )
-    st.plotly_chart(fig2)
+    st.plotly_chart(fig2, use_container_width=True)
 
 # Comparison feature
 if compare_stock != "None":
@@ -191,7 +191,7 @@ if compare_stock != "None":
         yaxis_title="Price (USD)",
         xaxis_rangeslider_visible=True
     )
-    st.plotly_chart(fig3)
+    st.plotly_chart(fig3, use_container_width=True)
 
 # Predict future prices
 df_train = data[["Date", "Close"]]
@@ -214,4 +214,4 @@ fig4.update_layout(
     xaxis_title="Date",  # Change the x-axis title
     yaxis_title="Predicted Price"  # Change the y-axis title
 )
-st.plotly_chart(fig4)
+st.plotly_chart(fig4, use_container_width=True)
