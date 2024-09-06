@@ -1,37 +1,198 @@
 import streamlit as st
 from datetime import date
-import yfinance
+import yfinance as yf
 from prophet import Prophet
 from prophet.plot import plot_plotly
 from plotly import graph_objs as go
+import pandas as pd
+import numpy as np
 
-START_DATE = "2012-01-01"
+# Constants
+DEFAULT_START_DATE = "2012-01-01"
 CURRENT_DATE = date.today().strftime("%Y-%m-%d")
 
-st.title("Stock Prediction App")
+# List of companies
+stocks = [
+    "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NVDA", "BRK-B", "UNH", "JPM",
+    "V", "MA", "HD", "DIS", "PYPL", "NFLX", "INTC", "CSCO", "PEP", "KO",
+    "NKE", "MRK", "XOM", "WMT", "ABT", "CRM", "COST", "CVX", "TMO", "ABNB",
+    "BABA", "MA", "BAC", "MCD", "WFC", "ORCL", "UPS", "AVGO", "ADBE", "IBM",
+    "AMT", "T", "MDT", "GS", "LMT", "QCOM", "TXN", "HON", "BA", "AMGN",
+    "GILD", "IBM", "MS", "MU", "SBUX", "ADP", "FIS", "CVS", "PFE"
+]
 
-stocks = ("GOOG", "AAPL", "MSFT", "GME")
-selected_stock = st.selectbox("Select stock", stocks)
+# App title and sidebar
+st.title("KorAlytics")
+st.subheader("Stock Prediction")
+st.sidebar.header("Choose your stock and settings")
 
-n_years = st.slider("Years of prediction:", 1, 4)
+# Sidebar inputs
+selected_stock = st.sidebar.selectbox("Select stock", stocks)
+start_date = st.sidebar.date_input("Start date", pd.to_datetime(DEFAULT_START_DATE))
+end_date = st.sidebar.date_input("End date", pd.to_datetime(CURRENT_DATE))
+n_years = st.sidebar.slider("Years of prediction:", 1, 5, 1)
+chart_type = st.sidebar.selectbox("Select current stock chart type", ["Line", "Bar"])
+show_technical_indicators = st.sidebar.checkbox("Show Technical Indicators", value=False)
+compare_stock = st.sidebar.selectbox("Compare with another stock (optional)", ["None"] + stocks)
 period = n_years * 365
 
 @st.cache_data
-def load_data(stock):
-    data = yfinance.download(stock, START_DATE, CURRENT_DATE)
+def load_data(stock, start, end):
+    data = yf.download(stock, start, end)
     data.reset_index(inplace=True)
     return data
 
-data = load_data(selected_stock)
-st.subheader("Stock data")
-st.write(data.tail())
+# Load data
+data = load_data(selected_stock, start_date, end_date)
+
+# Compute the change and direction
+last_close = data['Close'].iloc[-1]
+previous_close = data['Close'].iloc[-2] if len(data) > 1 else last_close
+change = last_close - previous_close
+arrow = "↑" if change > 0 else "↓" if change < 0 else "⸺"
+change_text = f"{arrow} {abs(change):.2f} USD"
+
+# Key Stats
+st.markdown(
+    """
+    <style>
+    .stats-card {
+        background-color: #1e1e1e;
+        border-radius: 15px;
+        padding: 20px;
+        color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        text-align: center; /* Center text inside the card */
+        width: 140px;
+        height: 110px;
+        display: inline-block;
+        vertical-align: top;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0px;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+    .neon {
+        color: #FF6F00; /* Neon green color */
+        font-family: 'Arial Black', sans-serif;
+        font-size: 18px;
+        text-align: center; /* Center the neon text */
+        margin: 0px; /* Remove default margin */
+        margin-bottom: 10px;
+        padding: 0; /* Remove default padding */
+        padding-left: 19px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+    .stats-card p {
+        font-family: 'Arial', sans-serif;
+        font-size: 15px;
+        margin-top: 0; /* Remove default margin to better center text */
+        padding-top: 0px;
+        font-weight: bold;
+    }
+
+    h1 {
+    font-size: 100px;
+    text-align: center;
+    font-family: "Proxima Nova";
+    font-weight: normal;
+    }
+    
+    h2, h3, h4 {
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+    }
+    .header-margin {
+        margin-bottom: 40px; /* Increase bottom margin */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Example statistics
+st.markdown(
+    f"""
+    <div class="container header-margin">
+        <div class="stats-card">
+            <h3 class="neon">Open</h3>
+            <p>{data['Open'].iloc[-1]:.2f} USD</p>
+        </div>
+        <div class="stats-card">
+            <h3 class="neon">Close</h3>
+            <p><span class="arrow">{arrow} {data['Close'].iloc[-1]:.2f} USD</span><br>{change_text}</p>
+        </div>
+        <div class="stats-card">
+            <h3 class="neon">High</h3>
+            <p>{data['High'].max():.2f} USD</p>
+        </div>
+        <div class="stats-card">
+            <h3 class="neon">Low</h3>
+            <p>{data['Low'].min():.2f} USD</p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Plot stock data
+st.subheader("Current Stock Data Overview")
 fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=data["Date"], y=data["Open"], name="stock_open"))
-fig1.add_trace(go.Scatter(x=data["Date"], y=data["Close"], name="stock_close"))
-fig1.layout.update(title_text="Time Series data", xaxis_rangeslider_visible=True)
+if chart_type == "Line":
+    fig1.add_trace(go.Scatter(x=data["Date"], y=data["Open"], name="Open", mode='lines'))
+    fig1.add_trace(go.Scatter(x=data["Date"], y=data["Close"], name="Close", mode='lines'))
+elif chart_type == "Bar":
+    fig1.add_trace(go.Bar(x=data["Date"], y=data["Open"], name="Open"))
+    fig1.add_trace(go.Bar(x=data["Date"], y=data["Close"], name="Close"))
+
+fig1.update_layout(
+    title=f"{selected_stock} Time Series Data",
+    title_x=0,  # Align title to the left
+    xaxis_title="Date",
+    yaxis_title="Price (USD)",
+    xaxis_rangeslider_visible=True
+)
 st.plotly_chart(fig1)
+
+# Show technical indicators
+if show_technical_indicators:
+    # Simple Moving Averages
+    data['SMA_30'] = data['Close'].rolling(window=30).mean()
+    data['SMA_100'] = data['Close'].rolling(window=100).mean()
+    
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(x=data["Date"], y=data["Close"], name="Close", mode='lines'))
+    fig2.add_trace(go.Scatter(x=data["Date"], y=data["SMA_30"], name="SMA 30", mode='lines', line=dict(color='orange')))
+    fig2.add_trace(go.Scatter(x=data["Date"], y=data["SMA_100"], name="SMA 100", mode='lines', line=dict(color='blue')))
+    fig2.update_layout(
+        title=f"{selected_stock} with Technical Indicators",
+        title_x=0,
+        xaxis_title="Date",
+        yaxis_title="Price (USD)",
+        xaxis_rangeslider_visible=True
+    )
+    st.plotly_chart(fig2)
+
+# Comparison feature
+if compare_stock != "None":
+    compare_data = load_data(compare_stock, start_date, end_date)
+    fig3 = go.Figure()
+    fig3.add_trace(go.Scatter(x=data["Date"], y=data["Close"], name=selected_stock, mode='lines'))
+    fig3.add_trace(go.Scatter(x=compare_data["Date"], y=compare_data["Close"], name=compare_stock, mode='lines'))
+    fig3.update_layout(
+        title=f"{selected_stock} vs {compare_stock}",
+        title_x=0,
+        xaxis_title="Date",
+        yaxis_title="Price (USD)",
+        xaxis_rangeslider_visible=True
+    )
+    st.plotly_chart(fig3)
 
 # Predict future prices
 df_train = data[["Date", "Close"]]
@@ -43,6 +204,15 @@ future = m.make_future_dataframe(periods=period)
 forecast = m.predict(future)
 
 # Plot forecast
-st.subheader("Forecast data")
-fig2 = plot_plotly(m, forecast)
-st.plotly_chart(fig2)
+st.subheader("Forecast Data")
+fig4 = plot_plotly(m, forecast)
+
+# Update trace colors and axis names
+fig4.update_traces(line_color='#A020F0')  # Change the color of the forecast line to neon purple
+fig4.update_layout(
+    title=f"{selected_stock} Price Forecast",
+    title_x=0,  # Align title to the left
+    xaxis_title="Date",  # Change the x-axis title
+    yaxis_title="Predicted Price"  # Change the y-axis title
+)
+st.plotly_chart(fig4)
