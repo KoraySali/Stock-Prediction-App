@@ -1,14 +1,13 @@
 import streamlit as st
 from datetime import date
 import yfinance as yf
-from prophet import Prophet
+from prophet.forecaster import Prophet
 from prophet.plot import plot_plotly
 from plotly import graph_objs as go
 import pandas as pd
-import numpy as np
 
 # Constants
-DEFAULT_START_DATE = "2012-01-01"
+DEFAULT_START_DATE = "1990-01-01"
 CURRENT_DATE = date.today().strftime("%Y-%m-%d")
 
 # List of companies
@@ -98,7 +97,7 @@ st.markdown(
     }
 
     h1 {
-    font-size: 100px;
+    font-size: 60px;
     text-align: center;
     font-family: "Proxima Nova";
     font-weight: normal;
