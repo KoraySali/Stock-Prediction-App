@@ -28,7 +28,7 @@ st.sidebar.header("Choose your stock and settings")
 # Sidebar inputs
 selected_stock = st.sidebar.selectbox("Select stock", stocks)
 start_date = st.sidebar.date_input("Start date", pd.to_datetime(DEFAULT_START_DATE))
-end_date = st.sidebar.date_input("End date", pd.to_datetime(CURRENT_DATE))
+end_date = st.sidebar.date_input(" date", pd.to_datetime(CURRENT_DATE))
 n_years = st.sidebar.slider("Years of prediction:", 0, 5, 1)
 n_months = st.sidebar.slider("Months of predicition", 0, 12, 1)
 n_days = st.sidebar.slider("Days of prediction:", 0, 365, 1)
@@ -211,7 +211,7 @@ if compare_stock != "None":
 df_train = data[["Date", "Close"]]
 df_train = df_train.rename(columns={"Date": "ds", "Close": "y"})
 
-m = Prophet()
+m = Prophet(interval_width=0.95)
 m.fit(df_train)
 period = period_year + period_months + period_days
 future = m.make_future_dataframe(periods=period)
@@ -227,6 +227,6 @@ fig4.update_layout(
     title=f"{selected_stock} Price Forecast",
     title_x=0,  # Align title to the left
     xaxis_title="Date",  # Change the x-axis title
-    yaxis_title="Predicted Price"  # Change the y-axis title
+    yaxis_title="Predicted Price" # Change the y-axis title
 )
 st.plotly_chart(fig4, use_container_width=True)
