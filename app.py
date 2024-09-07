@@ -96,24 +96,27 @@ st.markdown(
         font-weight: bold;
     }
     h1 {
-    font-size: 60px;
-    text-align: center;
-    font-family: "Proxima Nova";
-    font-weight: normal;
-    padding-bottom: 0px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+        font-size: 60px;
+        text-align: center;
+        font-family: "Proxima Nova";
+        font-weight: normal;
+        padding-bottom: 0px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
     } 
     h2, h3, h4 {
-    text-align: center;
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     .header-margin {
         margin-bottom: 40px; /* Increase bottom margin */
+            display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     </style>
     """,
