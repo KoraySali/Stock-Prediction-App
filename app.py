@@ -111,10 +111,11 @@ st.markdown(
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
+        font-size: 40px;
     }
     .header-margin {
         margin-bottom: 40px; /* Increase bottom margin */
-            display: flex;
+        display: flex;
         justify-content: center;
         flex-wrap: wrap;
     }
