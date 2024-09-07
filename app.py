@@ -64,7 +64,7 @@ st.markdown(
         margin: 10px;
         text-align: center; /* Center text inside the card */
         width: 140px;
-        height: 110px;
+        height: 120px;
         display: inline-block;
         vertical-align: top;
     }
