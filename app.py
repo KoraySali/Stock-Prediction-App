@@ -28,7 +28,7 @@ st.sidebar.header("Choose your stock and settings")
 # Sidebar inputs
 selected_stock = st.sidebar.selectbox("Select stock", stocks)
 start_date = st.sidebar.date_input("Start date", pd.to_datetime(DEFAULT_START_DATE))
-end_date = st.sidebar.date_input(" date", pd.to_datetime(CURRENT_DATE))
+end_date = st.sidebar.date_input("End date", pd.to_datetime(CURRENT_DATE))
 n_years = st.sidebar.slider("Years of prediction:", 0, 5, 1)
 n_months = st.sidebar.slider("Months of predicition", 0, 12, 1)
 n_days = st.sidebar.slider("Days of prediction:", 0, 365, 1)
