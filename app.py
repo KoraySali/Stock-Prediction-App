@@ -102,6 +102,9 @@ st.markdown(
     font-family: "Proxima Nova";
     font-weight: normal;
     padding-bottom: 0px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     }
     
     h2, h3, h4 {
