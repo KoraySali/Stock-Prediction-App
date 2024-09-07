@@ -95,7 +95,6 @@ st.markdown(
         padding-top: 0px;
         font-weight: bold;
     }
-
     h1 {
     font-size: 60px;
     text-align: center;
@@ -105,11 +104,13 @@ st.markdown(
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    }
-    
+    } 
     h2, h3, h4 {
-        text-align: center;
-        font-family: 'Arial', sans-serif;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     }
     .header-margin {
         margin-bottom: 40px; /* Increase bottom margin */
