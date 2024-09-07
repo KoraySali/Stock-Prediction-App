@@ -104,6 +104,7 @@ st.markdown(
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
+        padding-left: 10px;
     } 
     h2, h3, h4 {
         text-align: center;
