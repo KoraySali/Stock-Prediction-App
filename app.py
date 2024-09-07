@@ -29,11 +29,15 @@ st.sidebar.header("Choose your stock and settings")
 selected_stock = st.sidebar.selectbox("Select stock", stocks)
 start_date = st.sidebar.date_input("Start date", pd.to_datetime(DEFAULT_START_DATE))
 end_date = st.sidebar.date_input("End date", pd.to_datetime(CURRENT_DATE))
-n_years = st.sidebar.slider("Years of prediction:", 1, 5, 1)
+n_years = st.sidebar.slider("Years of prediction:", 0, 5, 1)
+n_months = st.sidebar.slider("Months of predicition", 0, 12, 1)
+n_days = st.sidebar.slider("Days of prediction:", 0, 365, 1)
 chart_type = st.sidebar.selectbox("Select current stock chart type", ["Line", "Bar"])
 show_technical_indicators = st.sidebar.checkbox("Show Technical Indicators", value=False)
 compare_stock = st.sidebar.selectbox("Compare with another stock (optional)", ["None"] + stocks)
-period = n_years * 365
+period_year = n_years * 365
+period_months = n_months * 30
+period_days = n_days * 1
 
 @st.cache_data
 def load_data(stock, start, end):
@@ -85,14 +89,14 @@ st.markdown(
         margin-bottom: 10px;
         padding: 0; /* Remove default padding */
         padding-left: 19px;
-        padding-top: 0px;
-        padding-bottom: 0px;
+        padding-top: -5px;
+        padding-bottom: -2px;
     }
     .stats-card p {
         font-family: 'Arial', sans-serif;
-        font-size: 15px;
+        font-size: 16px;
         margin-top: 0; /* Remove default margin to better center text */
-        padding-top: 0px;
+        padding-top: -5px;
         font-weight: bold;
     }
     h1 {
@@ -209,6 +213,7 @@ df_train = df_train.rename(columns={"Date": "ds", "Close": "y"})
 
 m = Prophet()
 m.fit(df_train)
+period = period_year + period_months + period_days
 future = m.make_future_dataframe(periods=period)
 forecast = m.predict(future)
 
