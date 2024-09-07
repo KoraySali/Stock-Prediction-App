@@ -101,6 +101,7 @@ st.markdown(
     text-align: center;
     font-family: "Proxima Nova";
     font-weight: normal;
+    padding-bottom: 0px;
     }
     
     h2, h3, h4 {
