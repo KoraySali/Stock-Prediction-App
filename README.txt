@@ -51,7 +51,7 @@ Users can input any stock ticker (compatible with Yahoo Finance) directly into t
 ### Live Execution  
 The app fetches the latest stock data in real time, preprocesses it, and visualises both historical and forecasted data dynamically.
 
-> *Tip: You can include a screenshot of your Streamlit app output here to make the README more engaging*
+
 
 ## Limitations and Notes  
 - The model is trained with limited epochs for demonstration and speed. Longer training and tuning of parameters would significantly improve accuracy.  
